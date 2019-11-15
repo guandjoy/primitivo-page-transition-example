@@ -12,9 +12,9 @@ var startPathParameters = {
   centerY: 700,
   rotate: 45,
   numOfGroups: 2,
-  incircle: false,
   groups: [
     {
+      incircle: false,
       type: "radial",
       round: 1,
       radius: 50,
@@ -23,6 +23,7 @@ var startPathParameters = {
       lengthBasedRound: true,
     },
     {
+      incircle: false,
       type: "linear",
       radius: 25,
       round: 1,
@@ -51,9 +52,10 @@ var endPathParameters = {
   centerY,
   rotate: 45,
   numOfGroups: 2,
-  incircle: false,
+
   groups: [
     {
+      incircle: false,
       type: "radial",
       round: 0,
       distance: 1,
@@ -61,6 +63,7 @@ var endPathParameters = {
       adaptArms: true,
     },
     {
+      incircle: false,
       type: "linear",
       distance: 1,
       round: 1,
@@ -114,62 +117,75 @@ function one() {
   console.log("progressions", progressions)
 }
 
-const phaseOneDur = 0.1
-const phaseTwoDur = 0.5
-const phaseThreeDur = 0.4
-var phaseOneProgressions = []
-var phaseTwoProgressions = []
-var phaseThreeProgressions = []
+function two() {
+  const phaseOneDur = 0.1
+  const phaseTwoDur = 0.5
+  const phaseThreeDur = 0.4
+  var phaseOneProgressions = []
+  var phaseTwoProgressions = []
+  var phaseThreeProgressions = []
 
-const numOfPhases = 3
-const phasesDur = [0.1, 0.5, 0.4]
-var phasesProgressions = [[], [], []]
-var phasesEnd = [[], [], []]
+  const numOfPhases = 3
+  const phasesDur = [0.1, 0.5, 0.4]
+  var phasesProgressions = [[], [], []]
+  var phasesEnd = [[], [], []]
 
-// Generate
-endPathObj.vertexes.forEach((keyVertex, keyIndex) => {
-  let length
-  let round
-  let maxLength = endPathObj.parameters.maxLengthByGroup[keyVertex.group]
-  let delta = maxLength / keyVertex.length
-  for (let i = 0; i < numOfPhases; i++) {
-    phasesEnd[i].push(false)
-    if (i === 0) {
-      phasesProgressions[i].push(phasesDur[i])
-      continue
+  // Generate
+  endPathObj.vertexes.forEach((keyVertex, keyIndex) => {
+    let length
+    let round
+    let maxLength = endPathObj.parameters.maxLengthByGroup[keyVertex.group]
+    let delta = maxLength / keyVertex.length
+    for (let i = 0; i < numOfPhases; i++) {
+      phasesEnd[i].push(false)
+      if (i === 0) {
+        phasesProgressions[i].push(phasesDur[i])
+        continue
+      }
+      phasesProgressions[i].push(
+        roundNum(phasesDur[i] / delta + phasesProgressions[i - 1][keyIndex])
+      )
     }
-    phasesProgressions[i].push(
-      roundNum(phasesDur[i] / delta + phasesProgressions[i - 1][keyIndex])
-    )
+  })
+
+  // Compose
+  var progressions = phasesProgressions.flat()
+
+  // Sort
+  progressions = progressions.sort((a, b) => a - b)
+
+  // Remove dublicates
+  let i = 0
+  while (i < progressions.length) {
+    if (progressions[i - 1] === progressions[i]) progressions.splice(i, 1)
+    else i += 1
   }
-})
 
-// Compose
-var progressions = phasesProgressions.flat()
+  var progressionsLength = []
+  var progressionsRound = []
 
-// Sort
-progressions = progressions.sort((a, b) => a - b)
+  for (let progression of progressions) {
+    let progressionLength = []
+    let progressionRound = []
+    endPathObj.vertexes.forEach((vertex, index) => {
+      let maxLength = endPathObj.parameters.maxLengthByGroup[keyVertex.group]
+      for (let i = 0; i < phasesEnd.length; i++) {
+        if (phasesEnd[i][index]) continue
+        if (i === 0) {
+          progressionLength.push(40)
+          progressionRound.push(1)
+          break
+        }
+        progressionLength.push()
+      }
+    })
+  }
 
-// Remove dublicates
-let i = 0
-while (i < progressions.length) {
-  if (progressions[i - 1] === progressions[i]) progressions.splice(i, 1)
-  else i += 1
+  console.log("progressions", progressions)
+
+  console.log("start path object", startPathObj)
+  console.log("end path object", endPathObj)
 }
-
-var progressionsLength = []
-var progressionsRound = []
-
-for (let progression of progressions) {
-  let progressionLength = []
-  let progressionRound = []
-  endPathObj.vertexes.forEach((vertex, index) => {})
-}
-
-console.log("progressions", progressions)
-
-console.log("start path object", startPathObj)
-console.log("end path object", endPathObj)
 
 var animateParameters = {
   numOfKeyPaths: 20,
@@ -187,9 +203,9 @@ var pathsParameters = {
   centerY: 370,
   rotate: 45,
   numOfGroups: 2,
-  incircle: false,
   groups: [
     {
+      incircle: false,
       type: "radial",
       distance: [0.5, 1],
       round: [0.8, 1],
@@ -198,6 +214,7 @@ var pathsParameters = {
       adaptArms: true,
     },
     {
+      incircle: false,
       type: "linear",
       distance: 0.1,
       radius: [30, 60],
